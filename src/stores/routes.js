@@ -129,7 +129,9 @@ export const useRoutesStore = defineStore('routes', () => {
     initiate: '/api/payments/initiate',
     confirm: '/api/payments/confirm',
     status: '/api/payments/status',
-    refund: '/api/payments/refund'
+    refund: '/api/payments/refund',
+    mercadoPagoInitiate: '/api/payments/mercadopago/initiate',
+    mercadoPagoConfirm: '/api/payments/mercadopago/confirm'
   });
 
   // Ruta de contacto

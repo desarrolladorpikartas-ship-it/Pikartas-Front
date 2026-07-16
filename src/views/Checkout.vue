@@ -116,7 +116,12 @@
               </h2>
               
               <div class="payment-method-selection">
-                <div class="payment-option selected">
+                <button
+                  type="button"
+                  class="payment-option"
+                  :class="{ selected: paymentProvider === 'webpay' }"
+                  @click="paymentProvider = 'webpay'"
+                >
                   <div class="payment-icon">
                     <font-awesome-icon icon="university" class="payment-icon-svg" />
                   </div>
@@ -124,10 +129,27 @@
                     <h3>Transbank Webpay Plus</h3>
                     <p>Pago seguro con tarjeta de crédito o débito</p>
                   </div>
-                  <div class="payment-check">
+                  <div class="payment-check" v-if="paymentProvider === 'webpay'">
                     <font-awesome-icon icon="check" class="check-icon" />
                   </div>
-                </div>
+                </button>
+                <button
+                  type="button"
+                  class="payment-option"
+                  :class="{ selected: paymentProvider === 'mercadopago' }"
+                  @click="paymentProvider = 'mercadopago'"
+                >
+                  <div class="payment-icon">
+                    <font-awesome-icon icon="credit-card" class="payment-icon-svg" />
+                  </div>
+                  <div class="payment-info">
+                    <h3>Mercado Pago</h3>
+                    <p>Tarjetas, saldo MP y otros medios disponibles</p>
+                  </div>
+                  <div class="payment-check" v-if="paymentProvider === 'mercadopago'">
+                    <font-awesome-icon icon="check" class="check-icon" />
+                  </div>
+                </button>
               </div>
 
             </div>
@@ -254,7 +276,7 @@ const shippingForm = reactive({
   zipCode: ''
 })
 
-// Payment form removed - using Transbank instead
+const paymentProvider = ref('webpay') // 'webpay' | 'mercadopago'
 
 const orderNotes = ref('')
 const isProcessing = ref(false)
@@ -331,6 +353,7 @@ const submitOrder = async () => {
     router.push({
       name: 'PaymentProcessing',
       query: {
+        provider: paymentProvider.value,
         // Pass shipping data for payment initiation
         shippingData: JSON.stringify({
           name: shippingForm.name,
@@ -569,16 +592,24 @@ onMounted(() => {
 }
 
 .payment-method-selection {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
   margin-bottom: 1.5rem;
 }
 
 .payment-option {
+  width: 100%;
+  text-align: left;
+  cursor: pointer;
+  font: inherit;
+  color: inherit;
+  appearance: none;
   display: flex;
   align-items: center;
   padding: 1rem;
   border: 2px solid rgba(253, 179, 28, 0.4);
   border-radius: var(--border-radius-lg);
-  cursor: pointer;
   transition: all var(--transition-normal);
   background: rgba(0, 0, 0, 0.2);
 }

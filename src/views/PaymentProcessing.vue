@@ -62,6 +62,7 @@ import { useRouter, useRoute } from 'vue-router'
 import { useCartStore } from '../stores/cart.js'
 import { useNotifications } from '../composables/useNotifications'
 import transbankService from '../services/transbank.js'
+import mercadoPagoService from '../services/mercadoPago.js'
 
 const router = useRouter()
 const route = useRoute()
@@ -72,12 +73,14 @@ const cartStore = useCartStore()
 const currentStep = ref(1)
 const error = ref('')
 const isRedirecting = ref(false)
+const paymentProvider = ref(route.query.provider === 'mercadopago' ? 'mercadopago' : 'webpay')
 
 // Payment data from route params
 const orderId = ref(route.query.orderId)
 const orderNumber = ref(route.query.orderNumber)
 const transbankUrl = ref(route.query.transbankUrl)
 const transbankToken = ref(route.query.token_ws)
+const mercadoPagoInitPoint = ref(route.query.initPoint)
 
 onMounted(async () => {
   // If we have a token from Transbank return, try to get stored payment data
@@ -103,7 +106,11 @@ const processPayment = async () => {
     else if (transbankUrl.value) {
       currentStep.value = 2
       await redirectToTransbank()
-    } 
+    }
+    else if (mercadoPagoInitPoint.value) {
+      currentStep.value = 2
+      await redirectToMercadoPago()
+    }
     // Step 3: Otherwise, initiate payment (coming from checkout)
     else {
       await initiatePayment()
@@ -114,43 +121,62 @@ const processPayment = async () => {
   }
 }
 
+const buildPaymentPayload = () => {
+  let shippingAddress = {
+    street: 'Av. Principal 123',
+    city: 'Santiago',
+    state: 'Metropolitana',
+    zipCode: '7500000',
+    country: 'Chile'
+  }
+
+  let shippingData = null
+  if (route.query.shippingData) {
+    try {
+      shippingData = JSON.parse(route.query.shippingData)
+      shippingAddress = {
+        street: shippingData.address,
+        city: shippingData.city,
+        state: 'Metropolitana',
+        zipCode: shippingData.zipCode,
+        country: 'Chile'
+      }
+    } catch {
+      // continue with default
+    }
+  }
+
+  return {
+    shippingAddress,
+    notes: shippingData?.orderNotes || undefined,
+    codigoCiudadDestino: shippingData?.codigoCiudadDestino,
+    clientShippingAmount: shippingData?.clientShippingAmount
+  }
+}
+
 const initiatePayment = async () => {
   try {
-    console.log('Initiating payment...')
+    console.log('Initiating payment...', { provider: paymentProvider.value })
     if (!transbankService.isAuthenticated()) {
       throw new Error('Debes iniciar sesión para procesar el pago')
     }
 
-    // Get shipping data from route query
-    let shippingAddress = {
-      street: "Av. Principal 123",
-      city: "Santiago",
-      state: "Metropolitana", 
-      zipCode: "7500000",
-      country: "Chile"
-    }
+    const paymentPayload = buildPaymentPayload()
 
-    let shippingData = null
-    if (route.query.shippingData) {
-      try {
-        shippingData = JSON.parse(route.query.shippingData)
-        shippingAddress = {
-          street: shippingData.address,
-          city: shippingData.city,
-          state: "Metropolitana",
-          zipCode: shippingData.zipCode,
-          country: "Chile"
-        }
-      } catch (err) {
-        // Error parsing shipping data - continue with default
-      }
-    }
-
-    const paymentPayload = {
-      shippingAddress,
-      notes: shippingData?.orderNotes || undefined,
-      codigoCiudadDestino: shippingData?.codigoCiudadDestino,
-      clientShippingAmount: shippingData?.clientShippingAmount
+    if (paymentProvider.value === 'mercadopago') {
+      const data = await mercadoPagoService.initiatePayment(paymentPayload)
+      orderId.value = data.data.orderId
+      orderNumber.value = data.data.orderNumber
+      mercadoPagoInitPoint.value = data.data.initPoint
+      mercadoPagoService.storePaymentData({
+        orderId: data.data.orderId,
+        orderNumber: data.data.orderNumber,
+        preferenceId: data.data.preferenceId,
+        initPoint: data.data.initPoint
+      })
+      currentStep.value = 2
+      await redirectToMercadoPago()
+      return
     }
 
     const data = await transbankService.initiatePayment(paymentPayload)
@@ -171,6 +197,16 @@ const initiatePayment = async () => {
     }
     throw new Error(err.message || 'Error al iniciar el pago')
   }
+}
+
+const redirectToMercadoPago = async () => {
+  if (!mercadoPagoInitPoint.value) {
+    throw new Error('URL de Mercado Pago no disponible')
+  }
+  isRedirecting.value = true
+  setTimeout(() => {
+    window.location.href = mercadoPagoInitPoint.value
+  }, 1500)
 }
 
 const redirectToTransbank = async () => {

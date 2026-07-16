@@ -130,6 +130,12 @@ const routes = [
     meta: { requiresAuth: true }
   },
   {
+    path: '/payment/mp/return',
+    name: 'PaymentMpReturn',
+    component: () => import('../views/PaymentMpReturn.vue'),
+    meta: { requiresAuth: true }
+  },
+  {
     path: '/orders',
     name: 'UserOrders',
     component: () => import('../views/UserOrders.vue'),
@@ -209,6 +215,15 @@ router.beforeEach(async (to, from, next) => {
     if (to.name === 'PaymentReturn' && to.query.token_ws) {
       // Allow access to payment return callback even without auth token
       // The backend validates the token_ws, providing security
+      next()
+      return
+    }
+
+    // Mercado Pago back_urls return (payment_id / preference_id validated on backend)
+    if (
+      to.name === 'PaymentMpReturn' &&
+      (to.query.payment_id || to.query.collection_id || to.query.preference_id || to.query.status)
+    ) {
       next()
       return
     }

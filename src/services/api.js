@@ -555,6 +555,34 @@ export const paymentService = {
       logger.error('Refund payment error:', error);
       throw formatApiError(error);
     }
+  },
+
+  async initiateMercadoPagoPayment(paymentPayload) {
+    try {
+      const routesStore = useRoutesStore();
+      const response = await axios.post(
+        routesStore.fullPaymentRoutes.mercadoPagoInitiate,
+        paymentPayload
+      );
+      return response.data;
+    } catch (error) {
+      logger.error('Initiate Mercado Pago payment error:', error);
+      throw formatApiError(error);
+    }
+  },
+
+  async confirmMercadoPagoPayment(payload) {
+    try {
+      const routesStore = useRoutesStore();
+      const response = await axios.post(
+        routesStore.fullPaymentRoutes.mercadoPagoConfirm,
+        payload
+      );
+      return response.data;
+    } catch (error) {
+      logger.error('Confirm Mercado Pago payment error:', error);
+      throw formatApiError(error);
+    }
   }
 };
 
