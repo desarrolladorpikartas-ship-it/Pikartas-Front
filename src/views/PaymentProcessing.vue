@@ -8,8 +8,8 @@
           </div>
         </div>
         
-        <h1>Procesando Pago</h1>
-        <p>Por favor espera mientras procesamos tu pago con Transbank...</p>
+        <h1>Procesando pago</h1>
+        <p>{{ processingMessage }}</p>
         
         <div class="processing-steps">
           <div class="step" :class="{ active: currentStep >= 1, completed: currentStep > 1 }">
@@ -18,7 +18,7 @@
           </div>
           <div class="step" :class="{ active: currentStep >= 2, completed: currentStep > 2 }">
             <div class="step-icon">2</div>
-            <span>Redirigiendo a Transbank</span>
+            <span>{{ redirectStepLabel }}</span>
           </div>
           <div class="step" :class="{ active: currentStep >= 3, completed: currentStep > 3 }">
             <div class="step-icon">3</div>
@@ -48,7 +48,7 @@
           <div class="redirect-icon">
             <font-awesome-icon icon="sync-alt" class="redirect-icon-svg" :spin="true" />
           </div>
-          <h3>Redirigiendo a Transbank...</h3>
+          <h3>{{ redirectingTitle }}</h3>
           <p>Serás redirigido automáticamente en unos segundos</p>
         </div>
       </div>
@@ -57,7 +57,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue'
+import { ref, computed, onMounted } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import { useCartStore } from '../stores/cart.js'
 import { useNotifications } from '../composables/useNotifications'
@@ -74,6 +74,16 @@ const currentStep = ref(1)
 const error = ref('')
 const isRedirecting = ref(false)
 const paymentProvider = ref(route.query.provider === 'mercadopago' ? 'mercadopago' : 'webpay')
+
+const isMercadoPago = computed(() => paymentProvider.value === 'mercadopago')
+const providerLabel = computed(() => (isMercadoPago.value ? 'Mercado Pago' : 'Transbank'))
+const processingMessage = computed(() =>
+  isMercadoPago.value
+    ? 'Estamos procesando tu pago. En un momento te llevamos a Mercado Pago...'
+    : 'Estamos procesando tu pago. En un momento te llevamos a Transbank...'
+)
+const redirectStepLabel = computed(() => `Redirigiendo a ${providerLabel.value}`)
+const redirectingTitle = computed(() => `Redirigiendo a ${providerLabel.value}...`)
 
 // Payment data from route params
 const orderId = ref(route.query.orderId)

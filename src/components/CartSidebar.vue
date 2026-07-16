@@ -325,7 +325,7 @@ const openLoginModal = () => {
 
 .loading-spinner {
   font-size: 2rem;
-  color: #666;
+  color: var(--color-white);
   animation: spin 2s linear infinite;
 }
 
@@ -426,7 +426,7 @@ const openLoginModal = () => {
   margin: 0;
   font-size: 0.875rem;
   font-weight: 600;
-  color: #333;
+  color: var(--color-white);
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -465,7 +465,7 @@ const openLoginModal = () => {
 
 .price {
   font-weight: 600;
-  color: #28a745;
+  color: var(--color-primary);
   font-size: 0.875rem;
 }
 
@@ -475,7 +475,7 @@ const openLoginModal = () => {
 
 .price-original {
   font-size: 0.75rem;
-  color: #999;
+  color: rgba(255, 255, 255, 0.65);
   text-decoration: line-through;
 }
 
@@ -498,8 +498,9 @@ const openLoginModal = () => {
 .quantity-controls {
   display: flex;
   align-items: center;
-  border: 1px solid #ddd;
+  border: 1px solid rgba(255, 255, 255, 0.35);
   border-radius: 4px;
+  background: rgba(0, 0, 0, 0.25);
 }
 
 .qty-btn {
@@ -511,13 +512,13 @@ const openLoginModal = () => {
   display: flex;
   align-items: center;
   justify-content: center;
-  color: #666;
+  color: var(--color-white);
   font-size: 0.75rem;
 }
 
 .qty-btn:hover:not(:disabled) {
-  background: #f0f0f0;
-  color: #333;
+  background: rgba(255, 255, 255, 0.12);
+  color: var(--color-white);
 }
 
 .qty-btn:disabled {
@@ -532,6 +533,7 @@ const openLoginModal = () => {
   padding: 0.25rem;
   font-size: 0.875rem;
   background: transparent;
+  color: var(--color-white);
   appearance: textfield;
   -moz-appearance: textfield;
 }
@@ -545,11 +547,11 @@ const openLoginModal = () => {
 .item-total {
   font-weight: 600;
   font-size: 0.875rem;
-  color: #333;
+  color: var(--color-white);
 }
 
 .cart-footer {
-  border-top: 1px solid #eee;
+  border-top: 1px solid rgba(255, 255, 255, 0.2);
   padding: 1rem;
 }
 
@@ -559,14 +561,14 @@ const openLoginModal = () => {
 
 .total-items {
   font-size: 0.875rem;
-  color: #666;
+  color: rgba(255, 255, 255, 0.9);
   margin-bottom: 0.25rem;
 }
 
 .total-price {
   font-size: 1.125rem;
   font-weight: 700;
-  color: #333;
+  color: var(--color-white);
 }
 
 .cart-actions {

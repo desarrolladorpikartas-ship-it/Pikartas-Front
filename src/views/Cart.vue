@@ -326,7 +326,7 @@ const canIncreaseQuantity = (item) => {
 
 .price-original {
   font-size: 0.875rem;
-  color: rgba(255, 255, 255, 0.45);
+  color: rgba(255, 255, 255, 0.75);
   text-decoration: line-through;
 }
 
@@ -472,13 +472,13 @@ const canIncreaseQuantity = (item) => {
 }
 
 .muted {
-  color: rgba(255, 255, 255, 0.55);
+  color: rgba(255, 255, 255, 0.9);
   font-size: 0.875rem;
 }
 
 .cart-shipping-hint {
   font-size: 0.8rem;
-  color: rgba(255, 255, 255, 0.65);
+  color: rgba(255, 255, 255, 0.9);
   margin: 0.5rem 0 0 0;
   line-height: var(--line-height-relaxed);
 }
